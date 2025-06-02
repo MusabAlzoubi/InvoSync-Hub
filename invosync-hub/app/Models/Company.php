@@ -18,4 +18,8 @@ class Company extends Model
     public function bankAccounts() { return $this->hasMany(BankAccount::class); }
     public function budgets() { return $this->hasMany(Budget::class); }
     public function assets() { return $this->hasMany(Asset::class); }
+    public function accounts() { return $this->hasMany(Account::class); }
+    public function apiClients() { return $this->hasMany(ApiClients::class); }
+    public function attachments() { return $this->hasMany(Attachment::class); }
+    public function auditLog() { return $this->hasMany(AuditLog::class); }
 }
