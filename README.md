@@ -45,6 +45,22 @@ app/
     └── WebhookService.php
 ```
 
+### 📁 Requests
+Form request validation classes grouped by module:
+
+```
+app/
+└── Http/
+    └── Requests/
+        ├── Invoice/
+        │   ├── StoreInvoiceRequest.php
+        │   └── UpdateInvoiceRequest.php
+        ├── Customer/
+        │   ├── StoreCustomerRequest.php
+        │   └── UpdateCustomerRequest.php
+        └── ... (other domains follow the same pattern)
+```
+
 ### 📁 Models
 Each model has its own migration and Eloquent relationships defined under `app/Models`.
 
