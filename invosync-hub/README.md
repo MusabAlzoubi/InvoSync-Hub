@@ -1,61 +1,159 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📦 InvoSync Hub – National E-Invoicing System (Jordan - JoFotara)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**InvoSync Hub** is a multi-tenant SaaS platform designed for Jordanian businesses to manage their invoicing, accounting, and government e-invoicing compliance through full integration with the Jordanian National E-Invoicing System (**JoFotara**).
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🎯 Project Goals
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- ✅ Seamless integration with Jordan's National E-Invoicing API (JoFotara)
+- ✅ Full support for all invoice types: Standard, Simplified, Credit Notes
+- ✅ Comprehensive customer/supplier management
+- ✅ Multi-user and multi-role support (Admin, Accountant, Sales, Viewer, etc.)
+- ✅ Modular structure with scalable service-based architecture
+- ✅ Extensible to integrate Power Automate, Power BI, or any third-party systems
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🏗️ Codebase Structure
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 📁 Controllers
+Organized by domain context:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── Admin/             # Manage companies, users, system configs
+│   │   ├── Accountant/        # Manage invoices, customers, suppliers, payments
+│   │   ├── API/               # API endpoints & integration points
+│   │   ├── Webhook/           # Handle callbacks from JoFotara or third parties
+│   │   └── Shared/            # Notifications, Reports, User profile
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 📁 Services
+Contains business logic separated from controllers:
 
-## Laravel Sponsors
+```
+app/
+└── Services/
+    ├── InvoiceService.php
+    ├── JoFotaraService.php
+    ├── CustomerService.php
+    ├── SupplierService.php
+    ├── PaymentService.php
+    └── WebhookService.php
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 📁 Models
+Each model has its own migration and Eloquent relationships defined under `app/Models`.
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+## 🔐 Roles & Permissions
 
-## Contributing
+This project uses `spatie/laravel-permission` to manage roles and permissions.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Available Roles:
 
-## Code of Conduct
+| Role         | Description                                                  |
+|--------------|--------------------------------------------------------------|
+| `Super Admin`| Full system access including global settings                 |
+| `Admin`      | Company-level admin: manages users, invoices, and settings   |
+| `Accountant` | Handles financial operations: invoices, journals, payments   |
+| `Sales`      | Creates and manages invoices only                            |
+| `Viewer`     | Read-only access to assigned data                            |
+| `Auditor`    | External/internal auditing access to reports and logs        |
+| `API Client` | External system or integration user                          |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## ⚙️ Used Packages
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| Package                             | Purpose                                 |
+|-------------------------------------|-----------------------------------------|
+| `laravel/breeze`                    | Authentication scaffolding              |
+| `spatie/laravel-permission`         | Role and permission management          |
+| `laravel/framework` (v10.x)         | Laravel core                            |
+| `PHP 8.2`                           | Programming language                    |
+| `MySQL 8+`                          | Database                                |
+| `TailwindCSS`                       | Frontend styling (via Breeze)           |
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🧾 Main Database Entities
+
+- `invoices`, `invoice_items`, `invoice_documents`, `invoice_status_logs`
+- `customers`, `suppliers`, `products`
+- `payments`, `supplier_payments`, `expenses`
+- `journals`, `journal_entries`, `accounts`
+- `companies`, `users`, `notifications`, `audit_logs`
+- `api_clients`, `webhook_logs`, `integration_errors`, `settings`
+
+Each model has full Eloquent relationships and supports tenant scoping.
+
+---
+
+## 🧩 JoFotara Integration
+
+This system is built to comply with JoFotara API specifications, including:
+
+- ✅ Generating unique UUIDs, QR codes, and digital signatures
+- ✅ Submitting invoices directly to the JoFotara API
+- ✅ Logging integration responses (success/failure)
+- ✅ Mapping full metadata for each invoice transaction
+- ✅ Multi-company secure isolation
+
+---
+
+## 🧰 Setup Instructions (basic)
+
+```bash
+# Install dependencies
+composer install
+npm install && npm run dev
+
+# Environment setup
+cp .env.example .env
+php artisan key:generate
+
+# Run migrations & seed roles
+php artisan migrate --seed
+
+# Create storage symlink (if needed)
+php artisan storage:link
+
+# Start local server
+php artisan serve
+```
+
+---
+
+## 🧠 Future Roadmap
+
+- Power BI / Power Automate integration
+- Custom billing plans for multi-tenant SaaS
+- Email/SMS invoice dispatch
+- Periodic financial reports and dashboards
+- Stripe or HyperPay integration for online payments
+- Multi-language support (Arabic/English UI)
+
+---
+
+## 👨‍💻 Developer
+
+**Musab Al-Zoubi**  
+📧 musab.m.alzoubii@gmail.com  
+🔗 [LinkedIn](https://www.linkedin.com/in/musab-al-zoubi)  
+🔗 [GitHub](https://github.com/MusabAlzo3bi)
+
+---
+
+## 📄 License
+
+This project is currently closed-source for commercial deployment and internal use.
+
+---
+
+> Current Version: `v0.1-alpha`  
+> Last updated: `June 2025`
