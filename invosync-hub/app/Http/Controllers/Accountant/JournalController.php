@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Accountant;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Journal;
 
 class JournalController extends Controller
 {
@@ -12,7 +13,8 @@ class JournalController extends Controller
      */
     public function index()
     {
-        //
+        $journals = Journal::with('journalEntries')->paginate(10);
+        return view('accountant.journal.index', compact('journals'));
     }
 
     /**
@@ -20,7 +22,8 @@ class JournalController extends Controller
      */
     public function create()
     {
-        //
+        $journals = Journal::paginate(10);
+        return view('accountant.journal.create', compact('journals'));
     }
 
     /**
@@ -28,7 +31,13 @@ class JournalController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title'=>'required|string|max:255'
+        ]);
+
+        Journal::create($validated);
+
+        return redirect()->route('journal.index')->with('success', 'Journal Created Successfully');
     }
 
     /**
@@ -36,7 +45,9 @@ class JournalController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $journal = Journal::with(['journalEntries:id,journal_id,field1,field2'])->findOrFail($id);
+
+        return view('accountant.journal.show', compact('journal'));
     }
 
     /**
@@ -44,7 +55,8 @@ class JournalController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $journal = Journal::findOrFail($id);
+        return view('accountant.journal.edit', compact('journal'));
     }
 
     /**
@@ -52,7 +64,12 @@ class JournalController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255'
+        ]);
+        $journal = Journal::findOrFail($id);
+        $journal->update($validated);
+        return redirect()->route('journal.index')->with('success', 'Journal Updated Successfully');
     }
 
     /**
@@ -60,6 +77,8 @@ class JournalController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $journal = Journal::findOrFail($id);
+        $journal->delete();
+        return redirect()->route('journal.index')->with('success', 'Journal Deleted Successfully');
     }
 }
