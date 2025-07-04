@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Accountant;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Asset;
 
 class AssetController extends Controller
 {
@@ -12,7 +13,9 @@ class AssetController extends Controller
      */
     public function index()
     {
-        //
+        $assets = Asset::with('company:id,name')
+            ->paginate(10);
+        return view('accountant.asset.index', compact('assets'));
     }
 
     /**
@@ -20,7 +23,8 @@ class AssetController extends Controller
      */
     public function create()
     {
-        //
+        $assets = Asset::paginate(10);
+        return view('accountant.asset.create', compact('assets'));
     }
 
     /**
@@ -28,7 +32,14 @@ class AssetController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'company_id' => 'required|exists:companies,id',
+            'name' => 'required|string|max:255',
+            'value' => 'required|numeric|min:0',
+            'purchase_date' => 'required|date',
+        ]);
+        Asset::create($validated);
+        return redirect()->route('accountant.asset.index')->with('success', 'Asset Created Successfully');
     }
 
     /**
@@ -36,7 +47,9 @@ class AssetController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $asset = Asset::with('company:id,name')
+            ->findOrFail($id);
+        return view('accountant.asset.show', compact('asset'));
     }
 
     /**
@@ -44,7 +57,9 @@ class AssetController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $asset = Asset::with('company:id,name')
+            ->findOrFail($id);
+        return view('accountant.asset.edit', compact('asset'));
     }
 
     /**
@@ -52,7 +67,16 @@ class AssetController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'company_id' => 'required|exists:companies,id',
+            'name' => 'required|string|max:255',
+            'value' => 'required|numeric|min:0',
+            'purchase_date' => 'required|date',
+        ]);
+
+        $asset = Asset::findOrFail($id);
+        $asset->update($validated);
+        return redirect()->route('accountant.asset.index')->with('success', 'Asset Updated Successfully');
     }
 
     /**
@@ -60,6 +84,8 @@ class AssetController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $asset = Asset::findOrFail($id);
+        $asset->delete();
+        return redirect()->route('accountant.asset.index')->with('success', 'Asset Deleted Successfully');
     }
 }

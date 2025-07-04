@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Accountant;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Reconciliation;
 
 class ReconciliationController extends Controller
 {
@@ -12,7 +13,9 @@ class ReconciliationController extends Controller
      */
     public function index()
     {
-        //
+        $reconciliations = Reconciliation::with('bankAccount:id,account_name')
+            ->paginate(10);
+        return view('accountant.reconciliation.index', compact('reconciliations'));
     }
 
     /**
@@ -20,7 +23,8 @@ class ReconciliationController extends Controller
      */
     public function create()
     {
-        //
+        $reconciliations = Reconciliation::paginate(10);
+        return view('accountant.reconciliation.create', compact('reconciliations'));
     }
 
     /**
@@ -28,7 +32,14 @@ class ReconciliationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'bank_account_id' => 'required|exists:bank_accounts,id',
+            'amount' => 'required|numeric|min:0',
+            'date' => 'required|date',
+        ]);
+
+        Reconciliation::create($validated);
+        return redirect()->route('accountant.reconciliation.index')->with('success', 'Reconciliation Created Successfully');
     }
 
     /**
@@ -36,7 +47,9 @@ class ReconciliationController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $reconciliations = Reconciliation::with('bankAccount:id,account_name')
+            ->findOrFail($id);
+        return view('accountant.reconciliation.show', compact('reconciliations'));
     }
 
     /**
@@ -44,7 +57,9 @@ class ReconciliationController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $reconciliation = Reconciliation::with('bankAccount:id,account_name')
+            ->findOrFail($id);
+        return view('accountant.reconciliation.edit', compact('reconciliation'));
     }
 
     /**
@@ -52,7 +67,15 @@ class ReconciliationController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'bank_account_id' => 'required|exists:bank_accounts,id',
+            'amount' => 'required|numeric|min:0',
+            'date' => 'required|date',
+        ]);
+
+        $reconciliation = Reconciliation::findOrFail($id);
+        $reconciliation->update($validated);
+        return redirect()->route('accountant.reconciliation.index')->with('success', 'Reconciliation Updated Successfully');
     }
 
     /**
@@ -60,6 +83,8 @@ class ReconciliationController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $reconciliation = Reconciliation::findOrFail($id);
+        $reconciliation->delete();
+        return redirect()->route('accountant.reconciliation.index')->with('success', 'Reconciliation Deleted Successfully');
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Accountant;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Payment;
 
 class PaymentController extends Controller
 {
@@ -12,7 +13,9 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        //
+        $payments = Payment::with('customer:id,name')
+            ->paginate(10);
+        return view('accountant.payment.index', compact('payments'));
     }
 
     /**
@@ -20,7 +23,8 @@ class PaymentController extends Controller
      */
     public function create()
     {
-        //
+        $payments = Payment::paginate(10);
+        return view('accountant.payment.create', compact('payments'));
     }
 
     /**
@@ -28,7 +32,15 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'amount' => 'required|numeric|min:0',
+            'payment_date' => 'required|date',
+            'method' => 'required|string|max:255',
+        ]);
+
+        Payment::create($validated);
+        return redirect()->route('accountant.payment.index')->with('success', 'Payment Created Successfully');
     }
 
     /**
@@ -36,7 +48,9 @@ class PaymentController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $payment = Payment::with('customer:id,name')
+            ->findOrFail($id);
+        return view('accountant.payment.show', compact('payment'));
     }
 
     /**
@@ -44,7 +58,9 @@ class PaymentController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $payment = Payment::with('customer:id,name')
+            ->findOrFail($id);
+        return view('accountant.payment.edit', compact('payment'));
     }
 
     /**
@@ -52,7 +68,16 @@ class PaymentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'amount' => 'required|numeric|min:0',
+            'payment_date' => 'required|date',
+            'method' => 'required|string|max:255',
+        ]);
+
+        $payment = Payment::findOrFail($id);
+        $payment->update($validated);
+        return redirect()->route('accountant.payment.index')->with('success', 'Payment Updated Successfully');
     }
 
     /**
@@ -60,6 +85,8 @@ class PaymentController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $payment = Payment::findOrFail($id);
+        $payment->delete();
+        return redirect()->route('accountant.payment.index')->with('success', 'Payment Deleted Successfully');
     }
 }
