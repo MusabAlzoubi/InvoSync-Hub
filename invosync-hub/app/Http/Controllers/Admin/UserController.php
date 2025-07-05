@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class UserController extends Controller
 {
@@ -12,7 +13,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $users = User::with('company:id')->latest()->paginate(10);
+        return view('admin.user.index', compact('users'));
     }
 
     /**
@@ -20,7 +22,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        $companies = Company::all();
+        return view('admin.user.create', compact('companies'));
     }
 
     /**
@@ -28,7 +31,16 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'company_id' => 'required|exists:companies,id',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $validated['password'] = Hash::make($validated['password']);
+        User::create($validated);
+        return redirect()->route('admin.user.index')->with('success', 'User Created Successfully');
     }
 
     /**
@@ -36,7 +48,8 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = User::with('company:id,name')->findOrFail($id);
+        return view('admin.user.show', compact('user'));
     }
 
     /**
@@ -44,7 +57,8 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user = User::with('company:id,name')->findOrFail($id);
+        return view('admin.user.edit', compact('user'));
     }
 
     /**
@@ -52,7 +66,20 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'company_id' => 'required|exists:companies,id',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->fill($validated);
+        if ($request->filled('password')) {
+            $user->password = Hash::make($validated['password']);
+        }
+        $user->save();
+        return redirect()->route('admin.user.index')->with('success', 'User Updated Successfully');
     }
 
     /**
@@ -60,6 +87,8 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->delete();
+        return redirect()->route('admin.user.index')->with('success', 'User Deleted Successfully');
     }
 }

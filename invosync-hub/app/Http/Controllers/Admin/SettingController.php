@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Setting;
 
 class SettingController extends Controller
 {
@@ -12,7 +13,8 @@ class SettingController extends Controller
      */
     public function index()
     {
-        //
+        $settings = Setting::paginate(10);
+        return view('admin.setting.index', compact('settings'));
     }
 
     /**
@@ -20,7 +22,7 @@ class SettingController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.setting.create');
     }
 
     /**
@@ -28,7 +30,14 @@ class SettingController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'company_id' => 'required|exists:companies,id',
+            'key' => 'required|string|max:255',
+            'value' => 'required|string|max:255',
+        ]);
+
+        Setting::create($validated);
+        return redirect()->route('admin.setting.index')->with('success', 'Setting Created Successfully');
     }
 
     /**
@@ -36,7 +45,9 @@ class SettingController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $settings = Setting::with('company:id,name')
+            ->findOrFail($id);
+        return view('admin.setting.show', compact('settings'));
     }
 
     /**
@@ -44,7 +55,9 @@ class SettingController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $setting = Setting::with('company:id,name')
+            ->findOrFail($id);
+        return view('admin.setting.edit', compact('setting'));
     }
 
     /**
@@ -52,7 +65,15 @@ class SettingController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'company_id' => 'required|exists:companies,id',
+            'key' => 'required|string|max:255',
+            'value' => 'required|string|max:255',
+        ]);
+
+        $setting = Setting::findOrFail($id);
+        $setting->update($validated);
+        return redirect()->route('admin.setting.index')->with('success', 'Setting Updated Successfully');
     }
 
     /**
@@ -60,6 +81,8 @@ class SettingController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $setting = Setting::findOrFail($id);
+        $setting->delete();
+        return redirect()->route('admin.setting.index')->with('success', 'Setting Deleted Successfully');
     }
 }
